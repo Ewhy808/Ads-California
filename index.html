@@ -59,7 +59,7 @@ const saved=localStorage.getItem("emcTown");
 if(saved) input.value=saved;
 
 function render(){
- const town=input.value.trim()||"san_Francisco";
+ const town=input.value.trim()||"San_Francisco";
  localStorage.setItem("emcTown",town);
  solo.textContent="do /t join "+town;
  box.innerHTML="";
