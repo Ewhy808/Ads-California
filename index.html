@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMC Ad Copy Board</title>
+<style>
+body{margin:0;padding:24px;background:#111318;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+h1{font-size:30px;margin:8px 0}.sub{color:#9da3ad;margin-bottom:28px}
+h2{font-size:20px;margin:28px 0 12px}
+.ad{display:flex;align-items:center;gap:12px;background:#1c2028;border:1px solid #303640;border-radius:12px;padding:12px;margin:10px 0}
+.txt{flex:1;font-size:15px;line-height:1.35}
+button{border:0;border-radius:9px;padding:11px 13px;font-weight:800;background:#fff;color:#111;min-width:76px;font-size:13px}
+button.done{background:#35c46a;color:#fff}
+.town-box{background:#1c2028;border:1px solid #303640;border-radius:12px;padding:14px;margin:14px 0 26px}
+.town-box label{display:block;font-size:12px;font-weight:800;color:#9da3ad;margin-bottom:8px}
+.town-box input{width:100%;box-sizing:border-box;background:#111318;color:#fff;border:1px solid #444b57;border-radius:9px;padding:12px;font-size:16px;outline:none}
+</style>
+</head>
+<body>
+<h1>EMC Ad Copy Board</h1>
+<div class="sub">Enter your town and the recruit ads update automatically.</div>
+
+<div class="town-box">
+<label for="town">TOWN NAME</label>
+<input id="town" type="text" value="san_Francisco" placeholder="e.g. san_Francisco" autocomplete="off">
+</div>
+
+<h2>⚡ SOLO COPY</h2>
+<div class="ad"><div class="txt" id="soloAd">do /t join san_Francisco</div><button id="soloButton">COPY</button></div>
+
+<h2>🏠 RECRUIT ADS</h2>
+<div id="recruitAds"></div>
+
+<h2>🎰 N SPAWN ADS</h2>
+<div class="ad"><div class="txt">WANNA GAMBLE GOLD? CASINO AT /N SPAWN CALIFORNIA</div><button onclick="copyText('WANNA GAMBLE GOLD? CASINO AT /N SPAWN CALIFORNIA',this)">COPY</button></div>
+<div class="ad"><div class="txt">WANT TO WIN BIG? GAMBLE AT /N SPAWN CALIFORNIA</div><button onclick="copyText('WANT TO WIN BIG? GAMBLE AT /N SPAWN CALIFORNIA',this)">COPY</button></div>
+<div class="ad"><div class="txt">FEELING LUCKY? CASINO AT /N SPAWN CALIFORNIA</div><button onclick="copyText('FEELING LUCKY? CASINO AT /N SPAWN CALIFORNIA',this)">COPY</button></div>
+<div class="ad"><div class="txt">GOT GOLD? GAMBLE AT /N SPAWN CALIFORNIA</div><button onclick="copyText('GOT GOLD? GAMBLE AT /N SPAWN CALIFORNIA',this)">COPY</button></div>
+<div class="ad"><div class="txt">READY TO GAMBLE? /N SPAWN CALIFORNIA</div><button onclick="copyText('READY TO GAMBLE? /N SPAWN CALIFORNIA',this)">COPY</button></div>
+<div class="ad"><div class="txt">WANT TO WIN BIG? HEAD TO /N SPAWN CALIFORNIA</div><button onclick="copyText('WANT TO WIN BIG? HEAD TO /N SPAWN CALIFORNIA',this)">COPY</button></div>
+
+<script>
+const templates=[
+"NEW? DO /t join {town} FOR FREE LOOT",
+"NEW PLAYERS DO /t join {town} FOR GEAR AND LAND",
+"NEW? DO /t join {town} FOR FREE GEAR",
+"NEW PLAYERS DO /t join {town} FOR FREE LAND",
+"NEW? DO /t join {town} FOR HELP AND GEAR",
+"NEW TO EMC? DO /t join {town} TO GET STARTED",
+"NEED A HOME? DO /t join {town} FOR LAND",
+"NEW PLAYER? DO /t join {town} FOR GEAR, LAND AND HELP"
+];
+
+const input=document.getElementById("town");
+const box=document.getElementById("recruitAds");
+const solo=document.getElementById("soloAd");
+const saved=localStorage.getItem("emcTown");
+if(saved) input.value=saved;
+
+function render(){
+ const town=input.value.trim()||"san_Francisco";
+ localStorage.setItem("emcTown",town);
+ solo.textContent="do /t join "+town;
+ box.innerHTML="";
+ templates.forEach(t=>{
+  const ad=t.replaceAll("{town}",town);
+  const row=document.createElement("div");
+  row.className="ad";
+  row.innerHTML='<div class="txt"></div><button>COPY</button>';
+  row.querySelector(".txt").textContent=ad;
+  row.querySelector("button").onclick=()=>copyText(ad,row.querySelector("button"));
+  box.appendChild(row);
+ });
+}
+input.addEventListener("input",render);
+document.getElementById("soloButton").onclick=()=>copyText(solo.textContent,document.getElementById("soloButton"));
+
+function copyText(text,btn){
+ const done=()=>{
+  btn.textContent="COPIED!";
+  btn.classList.add("done");
+  setTimeout(()=>{btn.textContent="COPY";btn.classList.remove("done")},1000);
+ };
+ if(navigator.clipboard && window.isSecureContext){
+  navigator.clipboard.writeText(text).then(done).catch(fallback);
+ }else fallback();
+ function fallback(){
+  const a=document.createElement("textarea");
+  a.value=text;a.style.position="fixed";a.style.left="-9999px";
+  document.body.appendChild(a);a.focus();a.select();
+  try{if(document.execCommand("copy"))done();}catch(e){}
+  a.remove();
+ }
+}
+render();
+</script>
+</body>
+</html>
